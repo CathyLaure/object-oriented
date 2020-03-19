@@ -1,5 +1,5 @@
 <?php
-namespace CathyLaure\object-oriented;
+namespace CathyLaure\ObjectOriented;
 /**
  * Trait to Validate a mySQL Date
  *
