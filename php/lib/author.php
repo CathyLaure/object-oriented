@@ -2,16 +2,16 @@
 require_once dirname(__DIR__, 1) . "/classes/Author.php";
 
 function bar() {
-	$authorId = "2261aff8-6a23-11ea-bc55-0242ac130003";
-	$authorActivationToken = "b50e0510-6a26-11ea-bc55-0242ac130003";
+	$authorId = "7c0686ea-34ab-4ed3-b7bd-9cdb558a1a5e";
+	$authorActivationToken = "2cdbd8fc2cdbd8fc2cdbd8fc2cdbd8fc";
 	$authorAvatarUrl = "https:/avatars.right.org/doing/m";
-	$authorHash = "861d7320-6a27-11ea-bc55-0242ac130003";
+	$authorHash = "3ce7418e3ce7418e3ce7418e3ce7418e";
 	$authorEmail = "levi012@gmail.com";
 	$authorUsername = "Levi";
 
 echo $authorEmail;
 
-	$author = new \CathyLaure\ObjectOriented\Author($authorId, $authorActivationToken, $authorAvatarUrl, $authorHash, $authorEmail, $authorUsername);
+	$author = new \CathyLaure\ObjectOriented\Author($authorId, $authorActivationToken, $authorAvatarUrl, $authorEmail,$authorHash, $authorUsername);
 		var_dump($author);
 	echo "$authorEmail <br> $authorActivationToken <br> $authorHash";
 }

@@ -16,10 +16,10 @@ class Author implements \JsonSerializable {
 	private $authorHash;
 	private $authorUserName;
 
-	public function __construct($newAuthorId, string $newAuthorActivatioToken, string $newAuthorAvatarUrl, string $newAuthorEmail, string $newAuthorHash, string $newAuthorUserName) {
+	public function __construct($newAuthorId, string $newAuthorActivationToken, string $newAuthorAvatarUrl, $newAuthorEmail, string $newAuthorHash, string $newAuthorUserName) {
 		try {
 			$this->setAuthorId($newAuthorId);
-			$this->setAuthorActivationToken($newAuthorActivatioToken);
+			$this->setAuthorActivationToken($newAuthorActivationToken);
 			$this->setAuthorAvatarUrl($newAuthorAvatarUrl);
 			$this->setAuthorEmail($newAuthorEmail);
 			$this->setAuthorHash($newAuthorHash);
@@ -121,7 +121,7 @@ class Author implements \JsonSerializable {
 	 * @throws \RangeException if $newEmail is > 128 characters
 	 * @throws \TypeError if $newEmail is not a string
 	 **/
-	public function setAuthorEmail(string $newAuthorEmail): void {
+	public function setAuthorEmail($newAuthorEmail): void {
 
 		// verify the email is secure
 		$newAuthorEmail = trim($newAuthorEmail);
@@ -165,10 +165,10 @@ class Author implements \JsonSerializable {
 		}
 
 		//enforce the hash is really an Argon hash
-		$authorHashInfo = password_get_info($newAuthorHash);
-		if($authorHashInfo["algoName"] !== "argon2i") {
-			throw(new \InvalidArgumentException("author hash is not a valid hash"));
-		}
+	//	$authorHashInfo = password_get_info($newAuthorHash);
+	//	if($authorHashInfo["algoName"] !== "argon2i") {
+	//		throw(new \InvalidArgumentException("author hash is not a valid hash"));
+	//	}
 
 		//enforce that the hash is exactly 128 characters.
 
