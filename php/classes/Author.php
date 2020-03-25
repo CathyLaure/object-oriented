@@ -218,22 +218,203 @@ class Author implements \JsonSerializable {
 		$this->authorUsername = $newAuthorUsername;
 	}
 
-	/**
-	 * formats the state variables for JSON serialization
-	 *
-	 * @return array resulting state variables to serialize
-	 **/
-	public function jsonSerialize(): array {
-		$fields = get_object_vars($this);
 
-		$fields["authorId"] = $this->authorId->toString();
-		$fields["authorActivationToken"] = $this->authorActivationToken->toString();
-		$fields["authorAvatarUrl"] = $this->authorAvatarUrl->toString();
-		$fields["authorEmail"] = $this->authorEmail->toString();
-		$fields["authorHash"] = $this->authorHash->toString();
-		$fields["authorUsername"] = $this->authorUserName->toString();
 
-		return ($fields);
-	}
+/*
+ * inserts this Author into mySQL
+ *
+ * @param \PDO $pdo PDO connection object
+ * @throws \PDOException when mySQL related errors occur
+ * @throws \TypeError if $pdo is not a PDO connection object
+ **/
+public function insert(\PDO $pdo): void {
+
+
+	// create query template
+	$query = "INSERT INTO profile(AuthorId, authorActivationToken, authorAvatarUrl,  authorEmail, authorHash, authorUsername) VALUES (:authorId, :authorActivationToken, :authorAvatarUrl, :authorEmail, :authorHash, :authorUsername)";
+	$statement = $pdo->prepare($query);
+
+	$parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl" => $this->authorAvatarUrl, "authorEmail" => $this->authorEmail, "authorHash" => $this->authorHash,"authorUsername" => $this->authorUsername];
+	$statement->execute($parameters);
+
+
 }
 
+/**
+ * deletes this Author from mySQL
+ *
+ * @param \PDO $pdo PDO connection object
+ * @throws \PDOException when mySQL related errors occur
+ * @throws \TypeError if $pdo is not a PDO connection object
+ **/
+public function delete(\PDO $pdo): void {
+
+	// create query template
+	$query = "DELETE FROM author WHERE authorId = :authorId";
+	$statement = $pdo->prepare($query);
+
+	//bind the member variables to the place holders in the template
+	$parameters = ["authorId" => $this->authorId->getBytes()];
+	$statement->execute($parameters);
+}
+
+/**
+ * updates this Profile from mySQL
+ *
+ * @param \PDO $pdo PDO connection object
+ * @throws \PDOException when mySQL related errors occur
+ **/
+public function update(\PDO $pdo): void {
+
+
+	// create query template
+	$query = "UPDATE author SET authorActivationToken = :authorActivationToken, authorAvatarUrl = :authorAvatarUrl, authorEmail = :authorEmail, authorHash = :authorHash, authorUsername = :authorUsername WHERE authorId = :authorId";
+	$statement = $pdo->prepare($query);
+
+	// bind the member variables to the place holders in the template
+
+	$parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl" => $this->authorAvatarUrl, "authorEmail" => $this->authorEmail, "authorHash" => $this->authorHash, "authorUsername" => $this->authorUsername];
+	$statement->execute($parameters);
+}
+
+/**
+ * gets the Profile by profile id
+ *
+ * @param \PDO $pdo $pdo PDO connection object
+ * @param  $authorId author Id to search for (the data type should be mixed/not specified)
+ * @return author|null Profile or null if not found
+ * @throws \PDOException when mySQL related errors occur
+ * @throws \TypeError when a variable are not the correct data type
+ **/
+public static function getAuthorByAuthorId(\PDO $pdo, $authorId):?Author {
+	// sanitize the profile id before searching
+	try {
+		$authorId = self::validateUuid($authorId);
+	} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
+		throw(new \PDOException($exception->getMessage(), 0, $exception));
+	}
+
+
+	// create query template
+	$query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM author WHERE authorId = :authorId";
+	$statement = $pdo->prepare($query);
+
+	// bind the author id to the place holder in the template
+	$parameters = ["authorId" => $authorId->getBytes()];
+	$statement->execute($parameters);
+
+	// grab the Author from mySQL
+	try {
+		$author = null;
+		$statement->setFetchMode(\PDO::FETCH_ASSOC);
+		$row = $statement->fetch();
+		if($row !== false) {
+
+			$profile = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"],$row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+		}
+	} catch(\Exception $exception) {
+		// if the row couldn't be converted, rethrow it
+		throw(new \PDOException($exception->getMessage(), 0, $exception));
+	}
+	return ($author);
+}
+
+/**
+ * gets the Author by email
+ *
+ * @param \PDO $pdo PDO connection object
+ * @param string $authorEmail email to search for
+ * @return Author|null Profile or null if not found
+ * @throws \PDOException when mySQL related errors occur
+ * @throws \TypeError when variables are not the correct data type
+ **/
+public static function getAuthorByAuthorEmail(\PDO $pdo, string $authorEmail): ?Author {
+	// sanitize the email before searching
+	$authorEmail = trim($authorEmail);
+	$authorEmail = filter_var($authorEmail, FILTER_VALIDATE_EMAIL);
+
+	if(empty($authorEmail) === true) {
+		throw(new \PDOException("not a valid email"));
+	}
+
+	// create query template
+	$query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM author WHERE authorEmail = :authorEmail";
+	$statement = $pdo->prepare($query);
+
+	// bind the author id to the place holder in the template
+	$parameters = ["authorEmail" => $authorEmail];
+	$statement->execute($parameters);
+
+	// grab the Author from mySQL
+	try {
+		$author = null;
+		$statement->setFetchMode(\PDO::FETCH_ASSOC);
+		$row = $statement->fetch();
+		if($row !== false) {
+			$profile = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+		}
+	} catch(\Exception $exception) {
+		// if the row couldn't be converted, rethrow it
+		throw(new \PDOException($exception->getMessage(), 0, $exception));
+	}
+	return ($author);
+}
+
+/**
+ * get the profile by author activation token
+ *
+ * @param string $authorActivationToken
+ * @param \PDO object $pdo
+ * @return Author|null Author or null if not found
+ * @throws \PDOException when mySQL related errors occur
+ * @throws \TypeError when variables are not the correct data type
+ **/
+public
+static function getAuthorByAuthorActivationToken(\PDO $pdo, string $authorActivationToken) : ?Author {
+	//make sure activation token is in the right format and that it is a string representation of a hexadecimal
+	$profileActivationToken = trim($authorActivationToken);
+	if(ctype_xdigit($authorActivationToken) === false) {
+		throw(new \InvalidArgumentException("author activation token is empty or in the wrong format"));
+	}
+
+	//create the query template
+	$query = "SELECT  authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM author WHERE authorActivationToken = :authorActivationToken";
+	$statement = $pdo->prepare($query);
+
+	// bind the author activation token to the placeholder in the template
+	$parameters = ["authorActivationToken" => $authorActivationToken];
+	$statement->execute($parameters);
+
+	// grab the Author from mySQL
+	try {
+		$author = null;
+		$statement->setFetchMode(\PDO::FETCH_ASSOC);
+		$row = $statement->fetch();
+		if($row !== false) {
+			$profile = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+		}
+	} catch(\Exception $exception) {
+		// if the row couldn't be converted, rethrow it
+		throw(new \PDOException($exception->getMessage(), 0, $exception));
+	}
+	return ($profile);
+}
+
+/**
+ * formats the state variables for JSON serialization
+ *
+ * @return array resulting state variables to serialize
+ **/
+public function jsonSerialize(): array {
+	$fields = get_object_vars($this);
+
+	$fields["authorId"] = $this->authorId->toString();
+	$fields["authorActivationToken"] = $this->authorActivationToken->toString();
+	$fields["authorAvatarUrl"] = $this->authorAvatarUrl->toString();
+	$fields["authorEmail"] = $this->authorEmail->toString();
+	$fields["authorHash"] = $this->authorHash->toString();
+	$fields["authorUsername"] = $this->authorUserName->toString();
+
+	return ($fields);
+}
+}
