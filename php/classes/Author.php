@@ -231,7 +231,7 @@ public function insert(\PDO $pdo): void {
 
 
 	// create query template
-	$query = "INSERT INTO profile(AuthorId, authorActivationToken, authorAvatarUrl,  authorEmail, authorHash, authorUsername) VALUES (:authorId, :authorActivationToken, :authorAvatarUrl, :authorEmail, :authorHash, :authorUsername)";
+	$query = "INSERT INTO author(AuthorId, authorActivationToken, authorAvatarUrl,  authorEmail, authorHash, authorUsername) VALUES (:authorId, :authorActivationToken, :authorAvatarUrl, :authorEmail, :authorHash, :authorUsername)";
 	$statement = $pdo->prepare($query);
 
 	$parameters = ["authorId" => $this->authorId->getBytes(), "authorActivationToken" => $this->authorActivationToken, "authorAvatarUrl" => $this->authorAvatarUrl, "authorEmail" => $this->authorEmail, "authorHash" => $this->authorHash,"authorUsername" => $this->authorUsername];
