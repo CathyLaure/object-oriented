@@ -278,7 +278,7 @@ public function update(\PDO $pdo): void {
 }
 
 /**
- * gets the Profile by profile id
+ * gets the Author by author id
  *
  * @param \PDO $pdo $pdo PDO connection object
  * @param  $authorId author Id to search for (the data type should be mixed/not specified)
@@ -361,7 +361,7 @@ public static function getAuthorByAuthorEmail(\PDO $pdo, string $authorEmail): ?
 }
 
 /**
- * get the profile by author activation token
+ * get the author by author activation token
  *
  * @param string $authorActivationToken
  * @param \PDO object $pdo
@@ -397,7 +397,7 @@ static function getAuthorByAuthorActivationToken(\PDO $pdo, string $authorActiva
 		// if the row couldn't be converted, rethrow it
 		throw(new \PDOException($exception->getMessage(), 0, $exception));
 	}
-	return ($profile);
+	return ($author);
 }
 
 /**
