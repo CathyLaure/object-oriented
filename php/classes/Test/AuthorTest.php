@@ -43,7 +43,7 @@ private $Valid_Username = "ctasama";
 
 		//get a copy of the record just inserted and validate the values
 		// make sure the values that went into the record are the same ones that come out
-	} }
+	}
 
 /*
 	public function testUpdateValidAuthor() : void {
@@ -61,7 +61,7 @@ private $Valid_Username = "ctasama";
 	public function testGetValidAuthors() : void {
 
 	}
-
+*/
 
 }
-*/
+
