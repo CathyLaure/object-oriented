@@ -9,13 +9,62 @@ use Ramsey\Uuid\Uuid;
 class Author implements \JsonSerializable {
 	use ValidateUuid;
 
-	private $authorId;
-	private $authorActivationToken;
-	private $authorAvatarUrl;
-	private $authorEmail;
-	private $authorHash;
-	private $authorUserName;
+	//authorId binary(16) not null,
+//authorActivationToken char(32),
+//authorAvatarUrl varchar(255),
+//authorEmail varchar(128) not null,
+//authorHash char(97) not null,
+//authorUsername varchar(32) not null,
 
+	/*
+	 * id for this primary key
+ 	* @var Uuid authorId
+ 	*/
+	private $authorId;
+
+	/*
+	 * activation token for this author
+	 */
+	private $authorActivationToken;
+
+	/*
+	 * avatar url for this Author
+	 */
+	private $authorAvatarUrl;
+
+	/*
+	 * email for this Author
+	 * @var string $authorEmail
+	 */
+	private $authorEmail;
+
+	/*
+	 * hash for this Author
+	 * @var string $authorHash
+	 */
+	private $authorHash;
+
+	/*
+	 * username for this Author
+	 * @var string $authorUsername
+	 */
+	private $authorUsername;
+
+
+	/*
+ * Constructor for this Author
+ * @param string|Uuid $authorId id of Author or null if a new id
+ * @param string $authorActivationToken activation token to safe gaurd against malicious code
+ * @param string $authorAvatarUrl string containing an avatar url or null
+ * @param string $authorEmail string containing the email
+ * @param string $authorHash string containing the password hash
+ * @param string $authorUsername string containing username
+ * @throws \InvalidArgumentException if data typs are not valid
+ * @throws \RangeException if data values are out of bound (eg , strings too long)
+ * @throws \TypeError if data types voilates data hints
+ * @throws \ Exception if some other exception uccurs
+ * @Documentation https://php.net/manual/en/language.oop5.decon.php
+ */
 	public function __construct($newAuthorId, string $newAuthorActivationToken, string $newAuthorAvatarUrl, $newAuthorEmail, string $newAuthorHash, string $newAuthorUserName) {
 		try {
 			$this->setAuthorId($newAuthorId);
@@ -30,10 +79,22 @@ class Author implements \JsonSerializable {
 		}
 	}
 
+	/**
+	 * accessor method for author id
+	 *
+	 * @return Uuid value of author id
+	 **/
 	public function getAuthorId(): Uuid {
 		return ($this->authorId);
 	}
 
+	/**
+	 * mutator method for author id
+	 *
+	 * @param Uuid|string $newAuthorId new value of author id
+	 * @throws \RangeException if $newAuthorId is not positive
+	 * @throws \TypeError if $newAuthorId is not a uuid or string
+	 **/
 	public function setAuthorId($newAuthorId): void {
 		try {
 			$uuid = self::validateUuid($newAuthorId);
@@ -78,6 +139,12 @@ class Author implements \JsonSerializable {
 		}
 		$this->authorActivationToken = $newAuthorActivationToken;
 	}
+
+	/**
+	 * accessor method for author Avatar Url
+	 *
+	 * @return string value of avatar url
+	 **/
 
 	public function getAuthorAvatarUrl(): string {
 		return ($this->authorAvatarUrl);
@@ -369,8 +436,7 @@ public static function getAuthorByAuthorEmail(\PDO $pdo, string $authorEmail): ?
  * @throws \PDOException when mySQL related errors occur
  * @throws \TypeError when variables are not the correct data type
  **/
-public
-static function getAuthorByAuthorActivationToken(\PDO $pdo, string $authorActivationToken) : ?Author {
+public static function getAuthorByAuthorActivationToken(\PDO $pdo, string $authorActivationToken) : ?Author {
 	//make sure activation token is in the right format and that it is a string representation of a hexadecimal
 	$profileActivationToken = trim($authorActivationToken);
 	if(ctype_xdigit($authorActivationToken) === false) {
