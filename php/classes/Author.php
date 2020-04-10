@@ -65,7 +65,7 @@ class Author implements \JsonSerializable {
  * @throws \ Exception if some other exception uccurs
  * @Documentation https://php.net/manual/en/language.oop5.decon.php
  */
-	public function __construct($newAuthorId, string $newAuthorActivationToken, string $newAuthorAvatarUrl, $newAuthorEmail, string $newAuthorHash, string $newAuthorUserName) {
+	public function __construct($newAuthorId, ?string $newAuthorActivationToken, string $newAuthorAvatarUrl, $newAuthorEmail, string $newAuthorHash, string $newAuthorUserName) {
 		try {
 			$this->setAuthorId($newAuthorId);
 			$this->setAuthorActivationToken($newAuthorActivationToken);
@@ -344,47 +344,52 @@ public function update(\PDO $pdo): void {
 	$statement->execute($parameters);
 }
 
-/**
- * gets the Author by author id
- *
- * @param \PDO $pdo $pdo PDO connection object
- * @param  $authorId author Id to search for (the data type should be mixed/not specified)
- * @return author|null Profile or null if not found
- * @throws \PDOException when mySQL related errors occur
- * @throws \TypeError when a variable are not the correct data type
- **/
-public static function getAuthorByAuthorId(\PDO $pdo, $authorId):?Author {
-	// sanitize the profile id before searching
-	try {
-		$authorId = self::validateUuid($authorId);
-	} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
-		throw(new \PDOException($exception->getMessage(), 0, $exception));
-	}
+	/**
+	 * gets a single data from the Author table in mySQL
+	 * @param uuid|string $authorId author id to search for
+	 * @param \PDO $pdo PDO connection object
+	 * @return Author|null Author found or null of not found
+	 * @throws \PDOException when mySQL related errors occur
+	 * @throws TypeError if $pdo is not a PDO connection object
+	 **/
+	public function getAuthorByAuthorId(\PDO $pdo, $authorId): ?Author {
+		//create query template
+		$query = "SELECT authorId,
+		authorActivationToken,
+		authorAvatarUrl,
+		authorEmail,
+		authorHash,
+		authorUsername 
+		FROM author WHERE authorId = :authorId";
+		$statement = $pdo->prepare($query);
+		try {
+			$authorId = self::validateUuid($authorId);
+		} catch(\InvalidArgumentException | \RangeException | \Exception | TypeError $exception) {
+			throw(new \PDOException($exception->getMessage(), 0, $exception));
+		}
 
+		//bind the objects to their respective placeholders in the table
+		$parameters = ["authorId" => $authorId->getBytes()];
+		$statement->execute($parameters);
 
-	// create query template
-	$query = "SELECT authorId, authorActivationToken, authorAvatarUrl, authorEmail, authorHash, authorUsername FROM author WHERE authorId = :authorId";
-	$statement = $pdo->prepare($query);
+		//grab author from database
 
-	// bind the author id to the place holder in the template
-	$parameters = ["authorId" => $authorId->getBytes()];
-	$statement->execute($parameters);
-
-	// grab the Author from mySQL
-	try {
 		$author = null;
 		$statement->setFetchMode(\PDO::FETCH_ASSOC);
 		$row = $statement->fetch();
-		if($row !== false) {
-
-			$profile = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"],$row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+		if($row !== false){
+			//instantiate author object and push data into it
+			$author = new Author($row["authorId"],
+				$row["authorActivationToken"],
+				$row["authorAvatarUrl"],
+				$row["authorEmail"],
+				$row["authorHash"],
+				$row["authorUsername"]);
 		}
-	} catch(\Exception $exception) {
-		// if the row couldn't be converted, rethrow it
-		throw(new \PDOException($exception->getMessage(), 0, $exception));
+		return ($author);
+
+
 	}
-	return ($author);
-}
 
 /**
  * gets the Author by email
@@ -457,7 +462,7 @@ public static function getAuthorByAuthorActivationToken(\PDO $pdo, string $autho
 		$statement->setFetchMode(\PDO::FETCH_ASSOC);
 		$row = $statement->fetch();
 		if($row !== false) {
-			$profile = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
+			$author = new Author($row["authorId"], $row["authorActivationToken"], $row["authorAvatarUrl"], $row["authorEmail"], $row["authorHash"], $row["authorUsername"]);
 		}
 	} catch(\Exception $exception) {
 		// if the row couldn't be converted, rethrow it
