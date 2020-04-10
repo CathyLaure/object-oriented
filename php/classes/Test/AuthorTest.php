@@ -17,7 +17,7 @@ class AuthorTest extends DataDesignTest {
 private $Valid_Activation_Token;
 private $Valid_Avatar_Url = "https:/avatars.right.org/doing/m";
 private $Valid_Author_Email= "ctasama@cnm.edu";
-private $Valid_Auhtor_Hash; //this will be done in the setup.
+private $Valid_Author_Hash; //this will be done in the setup.
 private $Valid_Username = "ctasama";
 
 	public function setUp(): void {
@@ -34,7 +34,7 @@ private $Valid_Username = "ctasama";
 
 		//insert an author record in the db
 		$authorId = generateUuidV4()->toString();
-		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Auhtor_Hash, $this->Valid_Username);
+		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Author_Hash, $this->Valid_Username);
 		$author->insert($this->getPDO());
 
 		// check count of author records in the db after the insert
@@ -59,7 +59,7 @@ private $Valid_Username = "ctasama";
 
 		//insert an author record in the db
 		$authorId = generateUuidV4()->toString();
-		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Auhtor_Hash, $this->Valid_Username);
+		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Author_Hash, $this->Valid_Username);
 		$author->insert($this->getPDO());
 
 		//update a value on the record I just inserted.
@@ -92,7 +92,7 @@ private $Valid_Username = "ctasama";
 
 		//insert an author record in the db
 		$authorId = generateUuidV4()->toString();
-		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Auhtor_Hash, $this->Valid_Username);
+		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Author_Hash, $this->Valid_Username);
 		$author->insert($this->getPDO());
 
 		// check count of author records in the db after the insert

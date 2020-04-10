@@ -65,14 +65,14 @@ class Author implements \JsonSerializable {
  * @throws \ Exception if some other exception uccurs
  * @Documentation https://php.net/manual/en/language.oop5.decon.php
  */
-	public function __construct($newAuthorId, ?string $newAuthorActivationToken, string $newAuthorAvatarUrl, $newAuthorEmail, string $newAuthorHash, string $newAuthorUserName) {
+	public function __construct($newAuthorId, ?string $newAuthorActivationToken, string $newAuthorAvatarUrl, string $newAuthorEmail, string $newAuthorHash, string $newAuthorUsername) {
 		try {
 			$this->setAuthorId($newAuthorId);
 			$this->setAuthorActivationToken($newAuthorActivationToken);
 			$this->setAuthorAvatarUrl($newAuthorAvatarUrl);
 			$this->setAuthorEmail($newAuthorEmail);
 			$this->setAuthorHash($newAuthorHash);
-			$this->setAuthorUserName($newAuthorUserName);
+			$this->setAuthorUserName($newAuthorUsername);
 		} catch(\InvalidArgumentException | \RangeException | \Exception | \TypeError $exception) {
 			$exceptionType = get_class($exception);
 			throw(new $exceptionType($exception->getMessage(), 0, $exception));
@@ -168,7 +168,7 @@ class Author implements \JsonSerializable {
 			throw(new \RangeException("image cloudinary content too large"));
 		}
 		// store the image cloudinary content
-		$this->AuthorAvatarUrl = $newAuthorAvatarUrl;
+		$this->authorAvatarUrl = $newAuthorAvatarUrl;
 	}
 
 	/**
@@ -378,6 +378,7 @@ public function update(\PDO $pdo): void {
 		$statement->setFetchMode(\PDO::FETCH_ASSOC);
 		$row = $statement->fetch();
 		if($row !== false){
+
 			//instantiate author object and push data into it
 			$author = new Author($row["authorId"],
 				$row["authorActivationToken"],
