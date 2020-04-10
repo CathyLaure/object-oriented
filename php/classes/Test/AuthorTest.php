@@ -83,27 +83,32 @@ private $Valid_Username = "ctasama";
 		//verify that the saved username is same as the updated username
 		self::assertEquals($changedAuthorUsername, $pdoAuthor->getAuthorUsername());
 	}
-//
-//
-//
-//	public function testDeleteValidAuthor() : void {
-//		//get count of author records in the database before we run the test.
-//		$numRows = $this->getConnection()->getRowCount("author");
-//
-//		//insert an author record in the db
-//		$authorId = generateUuidV4()->toString();
-//		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Author_Hash, $this->Valid_Username);
-//		$author->insert($this->getPDO());
-//
-//		// check count of author records in the db after the insert
-//		$numRowsAfterInsert = $this->getConnection()->getRowCount("author");
-//		self::assertEquals($numRows + 1, $numRowsAfterInsert, "insert checked record count");
-//
-//		//now delete the record we just  inserted
-//		$author->delete($this->getPDO());
-//
 
-//	}
+
+
+	public function testDeleteValidAuthor() : void {
+		//get count of author records in the database before we run the test.
+		$numRows = $this->getConnection()->getRowCount("author");
+
+		//insert an author record in the db
+		$authorId = generateUuidV4()->toString();
+		$author = new Author($authorId, $this->Valid_Activation_Token, $this->Valid_Avatar_Url, $this->Valid_Author_Email, $this->Valid_Author_Hash, $this->Valid_Username);
+		$author->insert($this->getPDO());
+
+		// check count of author records in the db after the insert
+		$numRowsAfterInsert = $this->getConnection()->getRowCount("author");
+		self::assertEquals($numRows + 1, $numRowsAfterInsert, "insert checked record count");
+
+		//now delete the record we just  inserted
+		$author->delete($this->getPDO());
+
+		//try to get the record. it should not exist.
+		$pdoAuthor = Author::getAuthorByAuthorId($this->getPDO(), $author->getAuthorId()->toString());
+		self::assertNull($pdoAuthor);
+
+		//verify the record count has returned to the original count before the record was inserted.
+		self::assertEquals($this->getConnection()->getRowCount("author"), $numRows);
+	}
 /*
 	public function testGetValidAuthorByAuthorId() : void {
 
